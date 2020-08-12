@@ -102,7 +102,7 @@ class Submitter:
     @property
     def wildcards_str(self) -> str:
         return (
-            ".".join("{}={}".format(k, v) for k, v in self.wildcards.items())
+            ".".join("{}-{}".format(k, v) for k, v in self.wildcards.items())
             or "unique"
         )
 
@@ -144,11 +144,11 @@ class Submitter:
 
     @property
     def outlog(self) -> Path:
-        return self.logdir / f"{self.wildcards_str}.out"
+        return self.logdir / f"{self.jobid}.out"
 
     @property
     def errlog(self) -> Path:
-        return self.logdir / f"{self.wildcards_str}.err"
+        return self.logdir / f"{self.jobid}.err"
 
     @property
     def jobinfo_cmd(self) -> str:
