@@ -8,17 +8,10 @@ from typing import List, Union, Optional
 
 from snakemake.utils import read_job_properties
 
-if not __name__.startswith("tests.src."):
-    sys.path.append(str(Path(__file__).parent.absolute()))
-    from OSLayer import OSLayer
-    from CookieCutter import CookieCutter
-    from lsf_config import Config
-    from memory_units import Unit, Memory
-else:
-    from .OSLayer import OSLayer
-    from .CookieCutter import CookieCutter
-    from .lsf_config import Config
-    from .memory_units import Unit, Memory
+sys.path.append(str(Path(__file__).parent.absolute()))
+from OSLayer import OSLayer
+from lsf_config import Config
+#from memory_units import Unit, Memory
 
 PathLike = Union[str, Path]
 
@@ -36,7 +29,7 @@ class Submitter:
         self,
         jobscript: PathLike,
         cluster_cmds: List[str] = None,
-        memory_units: Unit = Unit.MEGA,
+        #memory_units: Unit = Unit.MEGA,
         lsf_config: Optional[Config] = None,
     ):
         if cluster_cmds is None:
@@ -48,7 +41,7 @@ class Submitter:
         self._cluster_cmd = " ".join(cluster_cmds)
         self._job_properties = read_job_properties(self._jobscript)
         self.random_string = OSLayer.get_uuid4_string()
-        self._memory_units = memory_units
+        #self._memory_units = memory_units
         self.lsf_config = lsf_config
 
     @property
@@ -65,35 +58,30 @@ class Submitter:
 
     @property
     def threads(self) -> int:
-        return self.job_properties.get("threads", CookieCutter.get_default_threads())
+        return self.job_properties.get("threads", 1)
 
     @property
     def walltime(self) -> int:
-        return self.resources.get("walltime", CookieCutter.get_default_walltime())
+        return self.resources.get("walltime", 4)
 
     @property
     def resources(self) -> dict:
         return self.job_properties.get("resources", dict())
 
     @property
-    def mem_mb(self) -> Memory:
-        mem_value = self.resources.get(
-            "mem_mb", self.cluster.get("mem_mb", CookieCutter.get_default_mem_mb())
-        )
-        return Memory(mem_value, unit=Unit.MEGA)
+    def mem_mb(self) -> int:
+        return self.resources.get("mem_mb", self.cluster.get("mem_mb", 1024))
 
-    @property
-    def memory_units(self) -> Unit:
-        return self._memory_units
+    #@property
+    #def memory_units(self) -> Unit:
+    #    return self._memory_units
 
     @property
     def resources_cmd(self) -> str:
-        mem_in_clusters_units = self.mem_mb.to(self.memory_units)
-        mem_value_to_submit = math.ceil(mem_in_clusters_units.value)
         return (
             "-M {mem} -n {threads} "
-            "-R 'select[mem>{mem}] rusage[mem={mem}] span[hosts=1]' -W {walltime}:00"
-        ).format(mem=mem_value_to_submit, threads=self.threads, walltime=self.walltime)
+            "-R 'rusage[mem={mem}] span[hosts=1]' -W {walltime}:00"
+        ).format(mem=self.mem_mb, threads=self.threads, walltime=self.walltime)
 
     @property
     def wildcards(self) -> dict:
@@ -139,16 +127,16 @@ class Submitter:
 
     @property
     def logdir(self) -> Path:
-        project_logdir = Path(self.cluster.get("logdir", CookieCutter.get_log_dir()))
+        project_logdir = Path(self.cluster.get("logdir", "logs"))
         return project_logdir / self.rule_name
 
     @property
     def outlog(self) -> Path:
-        return self.logdir / f"{self.jobid}.out"
+        return self.logdir / f"{self.wildcards_str}.out"
 
     @property
     def errlog(self) -> Path:
-        return self.logdir / f"{self.jobid}.err"
+        return self.logdir / f"{self.wildcards_str}.err"
 
     @property
     def jobinfo_cmd(self) -> str:
@@ -158,7 +146,7 @@ class Submitter:
 
     @property
     def queue(self) -> str:
-        return self.cluster.get("queue", CookieCutter.get_default_queue())
+        return self.cluster.get("queue", "")
 
     @property
     def queue_cmd(self) -> str:
@@ -229,10 +217,10 @@ if __name__ == "__main__":
 
     jobscript = sys.argv[-1]
     cluster_cmds = sys.argv[1:-1]
-    memory_units = Unit.from_suffix(CookieCutter.get_lsf_unit_for_limits())
+    #memory_units = Unit.from_suffix("MB")
     lsf_submit = Submitter(
         jobscript=jobscript,
-        memory_units=memory_units,
+        #memory_units=memory_units,
         lsf_config=lsf_config,
         cluster_cmds=cluster_cmds,
     )
