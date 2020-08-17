@@ -12,3 +12,10 @@ then run snakemake as
 ```
 snakemake --profile "snakemake_lsf"
 
+## Differences
+
+- walltime
+  - minute/hour format 
+- disk_scratch
+  - $TMPDIR
+- log structure

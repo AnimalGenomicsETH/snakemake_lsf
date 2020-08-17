@@ -61,8 +61,12 @@ class Submitter:
         return self.job_properties.get("threads", 1)
 
     @property
-    def walltime(self) -> int:
-        return self.resources.get("walltime", 4)
+    def walltime(self) -> str:
+        return self.resources.get("walltime", "4:00")
+    
+    @property
+    def disk_scratch(self) -> int:
+        return self.resources.get("disk_scratch",0)    
 
     @property
     def resources(self) -> dict:
@@ -78,11 +82,10 @@ class Submitter:
 
     @property
     def resources_cmd(self) -> str:
-        return (
-            "-M {mem} -n {threads} "
-            "-R 'rusage[mem={mem}] span[hosts=1]' -W {walltime}:00"
-        ).format(mem=self.mem_mb, threads=self.threads, walltime=self.walltime)
-
+        r_cmd = f"-M {self.mem_mb} -n {self.threads} " \
+                f"-R 'rusage[mem={self.mem_mb},scratch={self.disk_scratch}] span[hosts=1]' " \
+                f"-W {self.walltime}"
+        return r_cmd
     @property
     def wildcards(self) -> dict:
         return self.job_properties.get("wildcards", dict())
