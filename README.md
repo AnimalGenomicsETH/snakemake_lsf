@@ -1,21 +1,47 @@
-## Custom snakemake config
+# Custom snakemake config
 
 Some basic config stuff for easier snakemake calling on Leonhard
 
 ## Install
-To install, first clone the repo into the ~/.config/snakemake directory
+To install, make a directory in the home config folder
 ```
-git clone https://github.com/ASLeonard/snakemake_lsf.git
+mkdir -p ~/.config/snakemake
+```
+and then clone the repo into that directory
+```
+cd ~/.config/snakemake && git clone https://github.com/ASLeonard/snakemake_lsf.git
 ```
 
-then run snakemake as 
+## Usage
+In theory, can then just run snakemake as 
 ```
 snakemake --profile "snakemake_lsf"
+```
+There may be some changes necessary if you require conda etc, which can be edited in config.yaml
 
 ## Differences
+Some new options were added
+- Under **resources:**
+  - walltime = "hours:minutes"
+  - disk_scratch = N (in units of mb)
+    - accessible only via the $TMPDIR variable 
+    - $TMPDIR only survives for the duration of **that** rule
+- **log** structure
+  - generally logs/{rule}/{wildcard_info}
+- Option to modify further for GPU or other specifics
 
-- walltime
-  - minute/hour format 
-- disk_scratch
-  - $TMPDIR
-- log structure
+### example
+An example which needs 8 hours and 30GB local-node storage for the output
+```
+rule assembler_hifiasm:
+    input:
+        'data/{animal}.hifi.fq.gz'
+    output:
+        'hifiasm/{animal}.asm.p_ctg.gfa'
+    threads: 24
+    resources:
+        mem_mb = 6000,
+        walltime = "8:00",
+        disk_scratch = 30000
+    shell: 'hifiasm -o $TMPDIR -t {threads} {input}; some other job using $TMPDIR'
+```
