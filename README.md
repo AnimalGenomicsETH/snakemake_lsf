@@ -23,7 +23,7 @@ There may be some changes necessary if you require conda etc, which can be edite
 Some new options were added
 - Under **resources:**
   - walltime = "hours:minutes"
-  - disk_scratch = N (in units of mb)
+  - disk_scratch = N (in units of mb **PER CORE**)
     - accessible only via the $TMPDIR variable 
     - $TMPDIR only survives for the duration of **that** rule
 - **log** structure
