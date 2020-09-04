@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import List, Union, Optional
-
+import datetime
 from snakemake.utils import read_job_properties
 
 sys.path.append(str(Path(__file__).parent.absolute()))
@@ -82,9 +82,11 @@ class Submitter:
 
     @property
     def resources_cmd(self) -> str:
-        r_cmd = f"-M {self.mem_mb} -n {self.threads} " \
-                f"-R 'rusage[mem={self.mem_mb},scratch={self.disk_scratch}] span[hosts=1]' " \
-                f"-W {self.walltime}"
+        r_cmd = f'-M {self.mem_mb} -n {self.threads} ' \
+                f'-R "rusage[mem={self.mem_mb}] span[hosts=1]" ' \
+                f'-W {self.walltime}'
+        if self.disk_scratch:
+            r_cmd += f' -R "rusage[scratch={self.disk_scratch*1000/self.threads}]"'
         return r_cmd
     @property
     def wildcards(self) -> dict:
@@ -135,11 +137,11 @@ class Submitter:
 
     @property
     def outlog(self) -> Path:
-        return self.logdir / f"{self.wildcards_str}.out"
+        return self.logdir / f"{self.wildcards_str}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.out"
 
     @property
     def errlog(self) -> Path:
-        return self.logdir / f"{self.wildcards_str}.err"
+        return self.logdir / f"{self.wildcards_str}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.err"
 
     @property
     def jobinfo_cmd(self) -> str:

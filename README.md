@@ -23,11 +23,11 @@ There may be some changes necessary if you require conda etc, which can be edite
 Some new options were added
 - Under **resources:**
   - walltime = "hours:minutes"
-  - disk_scratch = N (in units of mb **PER CORE**)
+  - disk_scratch = N GB (**NOTE** this is modified from normal behaviour which is MB per core)
     - accessible only via the $TMPDIR variable 
     - $TMPDIR only survives for the duration of **that** rule
 - **log** structure
-  - generally logs/{rule}/{wildcard_info}
+  - generally logs/{rule}/{wildcard_info}\_<current-time>
 - Option to modify further for GPU or other specifics
 
 ### example
@@ -42,6 +42,6 @@ rule assembler_hifiasm:
     resources:
         mem_mb = 6000,
         walltime = "8:00",
-        disk_scratch = 30000
+        disk_scratch = 30
     shell: 'hifiasm -o $TMPDIR -t {threads} {input}; some other job using $TMPDIR'
 ```
