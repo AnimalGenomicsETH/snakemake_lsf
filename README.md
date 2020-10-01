@@ -1,6 +1,6 @@
 # Custom snakemake config
 
-Some basic config stuff for easier snakemake calling on Leonhard
+Some basic config stuff for easier snakemake calling on Leonhard cluster.
 
 ## Install
 To install, make a directory in the home config folder
