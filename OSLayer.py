@@ -1,5 +1,6 @@
 import subprocess
 import uuid
+import time
 from pathlib import Path
 from typing import Tuple, List
 
@@ -48,8 +49,11 @@ class OSLayer:
     @staticmethod
     def tail(path: str, num_lines: int = 10) -> List[bytes]:
         if not Path(path).exists():
-            raise FileNotFoundError("{} does not exist.".format(path))
-
+            # allow for filesystem latency
+            time.sleep(5)
+            if not Path(path).exists():
+                raise FileNotFoundError("{} does not exist.".format(path))
+        
         process = subprocess.Popen(
             ["tail", "-n", str(num_lines), path],
             stdout=subprocess.PIPE,
