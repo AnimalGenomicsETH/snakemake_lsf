@@ -75,6 +75,10 @@ class Submitter:
     @property
     def mem_mb(self) -> int:
         return self.resources.get("mem_mb", self.cluster.get("mem_mb", 1024))
+    
+    @property
+    def use_singularity(self) -> int:
+        return self.resoures.get("use_singularity",0)
 
     #@property
     #def memory_units(self) -> Unit:
@@ -87,7 +91,10 @@ class Submitter:
                 f'-W {self.walltime}'
         if self.disk_scratch:
             r_cmd += f' -R "rusage[scratch={self.disk_scratch*1000/self.threads}]"'
+        if self.use_singularity:
+            r_cmd += ' -R singularity'
         return r_cmd
+    
     @property
     def wildcards(self) -> dict:
         return self.job_properties.get("wildcards", dict())
