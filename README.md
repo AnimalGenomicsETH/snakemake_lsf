@@ -9,7 +9,7 @@ mkdir -p ~/.config/snakemake
 ```
 and then clone the repo into that directory
 ```
-cd ~/.config/snakemake && git clone https://github.com/ASLeonard/snakemake_lsf.git
+cd ~/.config/snakemake && git clone https://github.com/AnimalGenomicsETH/snakemake_lsf.git
 ```
 
 ## Usage
@@ -26,6 +26,8 @@ Some new options were added
   - disk_scratch = N GB (**NOTE** this is modified from normal behaviour which is MB per core)
     - accessible only via the $TMPDIR variable 
     - $TMPDIR only survives for the duration of **that** rule
+  - use_singularity = True
+    - sets the singularity flag (if you already have access)
 - **log** structure
   - generally logs/{rule}/{wildcard_info}\_<current-time>
 - Option to modify further for GPU or other specifics
