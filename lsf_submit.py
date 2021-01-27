@@ -78,7 +78,7 @@ class Submitter:
     
     @property
     def use_singularity(self) -> int:
-        return self.resoures.get("use_singularity",0)
+        return self.resources.get("use_singularity",0)
 
     #@property
     #def memory_units(self) -> Unit:
