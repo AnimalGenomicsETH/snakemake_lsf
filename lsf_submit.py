@@ -144,11 +144,11 @@ class Submitter:
 
     @property
     def outlog(self) -> Path:
-        return self.logdir / f"{self.wildcards_str}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.out"
+        return self.logdir / f"{self.wildcards_str.replace('/','.slash.')}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.out"
 
     @property
     def errlog(self) -> Path:
-        return self.logdir / f"{self.wildcards_str}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.err"
+        return self.logdir / f"{self.wildcards_str.replace('/','.slash.')}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.err"
 
     @property
     def jobinfo_cmd(self) -> str:
